@@ -1,0 +1,731 @@
+ME.schoolName || 'Lunavex'let TOKEN = localStorage.getItem('sms_token') || '';
+let ME = JSON.parse(localStorage.getItem('sms_user') || 'null');
+const $ = (id) => document.getElementById(id);
+const money = (n) => Number(n || 0).toLocaleString();
+const flagCls = (f) => 'flag ' + String(f || '').replace(/ /g, '.');
+
+// ---- Standard vector icons (feather-style, no emojis) ----
+const ICONS = {
+  home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  trending: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  graduation: '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/>',
+  userplus: '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+  money: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  checksq: '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  settings: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+  lifebuoy: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  video: '<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>',
+  book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  clipboard: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
+};
+Object.assign(ICONS, {
+  phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  play: '<polygon points="5 3 19 12 5 21 5 3"/>',
+  camera: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1"/>',
+  send: '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  award: '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  alert: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'
+});
+function ic(n, s) {
+  s = s || 16;
+  return '<svg class="ic" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[n] || '') + '</svg>';
+}
+
+function auth() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN }; }
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: auth() });
+  return r.json();
+}
+function pick(e, p) { $('email').value = e; $('password').value = p; login(); }
+async function login() {
+  const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: $('email').value, password: $('password').value }) });
+  const d = await r.json();
+  if (d.token) { TOKEN = d.token; ME = d.user; localStorage.setItem('sms_token', TOKEN); localStorage.setItem('sms_user', JSON.stringify(ME)); boot(); }
+  else $('loginMsg').textContent = d.error || 'Login failed';
+}
+function logout() { TOKEN = ''; ME = null; localStorage.clear(); location.reload(); }
+function showRegister() { $('loginCard').style.display = 'none'; $('regCard').style.display = 'block'; $('regMsg').textContent = ''; }
+function hideRegister() { $('regCard').style.display = 'none'; $('loginCard').style.display = 'block'; $('loginMsg').textContent = ''; }
+async function registerSchool() {
+  const b = {
+    schoolName: $('r_schoolName').value.trim(), email: $('r_email').value.trim(), password: $('r_password').value,
+    phone: $('r_phone').value.trim(), headName: $('r_headName').value.trim(), headPassword: $('r_headPassword').value
+  };
+  if (!b.schoolName || !b.email || !b.password || !b.headName || !b.headPassword) { $('regMsg').textContent = 'All fields except phone are required'; return; }
+  const r = await fetch('/api/register-school', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+  const d = await r.json();
+  if (d.ok) {
+    $('regMsg').className = 'ok';
+    $('regMsg').textContent = 'School created! Login with ' + d.headEmail + ' (Head Teacher).';
+    setTimeout(() => { hideRegister(); $('email').value = d.headEmail; $('password').value = b.headPassword; }, 1200);
+  } else { $('regMsg').className = 'err'; $('regMsg').textContent = d.error || 'Registration failed'; }
+}
+// ---- Superadmin: create accounts on any school (auto-generate username + password) ----
+async function vAccounts() {
+  const d = await api('/api/schools');
+  const schools = d.schools || [];
+  $('content').innerHTML = `<div class="card"><h3>Create account on a school</h3>
+    <p class="muted">The system automatically generates a unique username and a secure password for each account you create. You can share these with the user.</p>
+    <select id="ac_school"><option value="">-- Choose a school --</option>${schools.map((s) => `<option value="${s.id}">${s.name} (${s.email})</option>`).join('')}</select>
+    <div id="ac_role_opts"></div>
+    <div id="ac_auto"></div>
+    <button class="btn green" onclick="createAccountSuper()">${ic('plus')} Create account with auto-generated credentials</button>
+    <p id="ac_msg" class="err"></p></div>`;
+  $('ac_role_opts').innerHTML = `<label>Role</label><select id="ac_role" onchange="acRoleChanged()">${ROLE_OPTS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>`;
+  $('ac_auto').innerHTML = `<label>Prefill username (optional; system makes it unique)</label><input id="ac_username" placeholder="e.g. jdoe"><p class="muted">Leave blank to auto-generate a username.</p>`;
+  $('ac_role').value = 'teacher';
+  acRoleChanged();
+}
+async function createAccountSuper() {
+  const schoolId = $('ac_school').value;
+  const name = $('ac_name').value.trim();
+  const email = $('ac_email').value.trim();
+  const role = $('ac_role').value;
+  const username = $('ac_username').value.trim();
+  const msg = $('ac_msg');
+  if (!schoolId) { msg.className = 'err'; msg.textContent = 'Select a school first'; return; }
+  if (!name || !email) { msg.className = 'err'; msg.textContent = 'Full name and email are required'; return; }
+  if (!email.match(/@/)) { msg.className = 'err'; msg.textContent = 'Enter a valid email'; return; }
+  const r = await api('/api/users', { method: 'POST', body: JSON.stringify({ schoolId, name, email, role, username }) });
+  if (r.ok) {
+    msg.className = 'ok';
+    msg.textContent = 'Account created! Username: ' + r.user.username + '  |  Password: ' + r.user.password;
+  } else {
+    msg.className = 'err';
+    msg.textContent = r.error || 'Failed';
+  }
+}
+// ---- Superadmin: list + manage school accounts ----
+async function vSchools() {
+  const d = await api('/api/schools');
+  const rows = (d.schools || []).map((s) => `<tr>
+    <td><b>${s.name}</b><div class="muted">${s.email}</div></td>
+    <td>${s.students || 0} learners</td><td>${s.users || 0} users</td>
+    <td><span class="pill ${s.status}">${s.status}</span></td>
+    <td class="nowrap">
+      ${s.status === 'active' ? `<button class="btn ghost sm" onclick="schoolAct('${s.id}','suspended')">Suspend</button>` : `<button class="btn ghost sm" onclick="schoolAct('${s.id}','active')">Activate</button>`}
+      <button class="btn ghost sm" onclick="resetHead('${s.id}')">Reset HT password</button>
+      <button class="btn danger sm" onclick="delSchool('${s.id}','${s.name}')">Delete</button>
+    </td></tr>`).join('');
+  $('content').innerHTML = `<div class="card"><h3>Schools (${(d.schools || []).length})</h3>
+    <p class="muted">Each school's data is fully isolated. Suspend blocks all logins for that school. Delete removes the school and its data permanently.</p>
+    <table class="list"><thead><tr><th>School</th><th>Size</th><th>Accounts</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="5" class="muted">No schools yet</td></tr>'}</tbody></table></div>`;
+}
+async function schoolAct(id, status) { await api('/api/schools/' + id, { method: 'PUT', body: JSON.stringify({ status }) }); vSchools(); }
+async function resetHead(id) {
+  const pw = prompt('New head-teacher password for this school:');
+  if (!pw) return;
+  await api('/api/schools/' + id, { method: 'PUT', body: JSON.stringify({ resetHeadPassword: pw }) });
+  alert('Head-teacher password updated.');
+}
+async function delSchool(id, name) {
+  if (!confirm('Delete "' + name + '" and ALL its data? This cannot be undone.')) return;
+  await api('/api/schools/' + id, { method: 'DELETE' });
+  vSchools();
+}
+function vAddSchool() {
+  $('content').innerHTML = `<div class="card"><h3>Add a school</h3>
+    <p class="muted">Creates a new school account and its head-teacher login. The head teacher can then add their own staff and learners.</p>
+    <input id="a_name" placeholder="School name">
+    <input id="a_email" placeholder="School email (login)">
+    <input id="a_password" type="password" placeholder="School password">
+    <input id="a_phone" placeholder="School phone (optional)">
+    <input id="a_head" placeholder="Head teacher name">
+    <input id="a_headpw" type="password" placeholder="Head teacher password">
+    <button class="btn" onclick="addSchool()">Create school &rarr;</button>
+    <p id="a_msg" class="err"></p></div>`;
+}
+async function addSchool() {
+  const b = { schoolName: $('a_name').value.trim(), email: $('a_email').value.trim(), password: $('a_password').value, phone: $('a_phone').value.trim(), headName: $('a_head').value.trim(), headPassword: $('a_headpw').value };
+  if (!b.schoolName || !b.email || !b.password || !b.headName || !b.headPassword) { $('a_msg').textContent = 'All fields except phone are required'; return; }
+  const r = await api('/api/schools', { method: 'POST', body: JSON.stringify(b) });
+  if (r.ok) { $('a_msg').className = 'ok'; $('a_msg').textContent = 'School created.'; setTimeout(vSchools, 800); }
+  else { $('a_msg').className = 'err'; $('a_msg').textContent = r.error || 'Failed'; }
+}
+// ---- DISTINCT PORTALS: each role gets its own tabs + banner + home ----
+const PORTALS = {
+  superadmin: {
+    label: 'System Admin — All Schools',
+    desc: 'Platform level: create, suspend, activate and delete school accounts. Each school data stays private to that school.',
+    tabs: [['home', 'home', 'Home'], ['schools', 'users', 'Schools'], ['addschool', 'plus', 'Add School'], ['accounts', 'userplus', 'Create Accounts']]
+  },
+  admin: {
+    label: 'School Admin — Full Control',
+    desc: 'Everything: accounts for every role, LDJS, reports, pupils, fees, attendance, timetable, duty roster, imports, SMS, settings.',
+    tabs: [['home', 'home', 'Home'], ['accounts', 'userplus', 'Accounts'], ['students', 'graduation', 'Pupils'], ['import', 'upload', 'Import Excel'], ['ldjs', 'trending', 'LDJS Tracker'], ['reports', 'file', 'Reports'], ['fees', 'money', 'Fees'], ['attend', 'checksq', 'Attendance'], ['time', 'calendar', 'Timetable'], ['duty', 'shield', 'Duty Roster'], ['papers', 'clipboard', 'Papers'], ['work', 'book', 'Classwork'], ['videos', 'video', 'Videos'], ['sms', 'message', 'SMS'], ['setup', 'settings', 'Setup']]
+  },
+  admin: {
+    label: 'School Admin — Full Control',
+    desc: 'Everything: accounts for every role, LDJS, reports, pupils, fees, attendance, timetable, duty roster, imports, SMS, settings.',
+    tabs: [['home', 'home', 'Home'], ['accounts', 'userplus', 'Accounts'], ['students', 'graduation', 'Pupils'], ['import', 'upload', 'Import Excel'], ['ldjs', 'trending', 'LDJS Tracker'], ['reports', 'file', 'Reports'], ['fees', 'money', 'Fees'], ['attend', 'checksq', 'Attendance'], ['time', 'calendar', 'Timetable'], ['duty', 'shield', 'Duty Roster'], ['papers', 'clipboard', 'Papers'], ['work', 'book', 'Classwork'], ['videos', 'video', 'Videos'], ['sms', 'message', 'SMS'], ['setup', 'settings', 'Setup']]
+  },
+  headteacher: {
+    label: 'Head Teacher — People & Learning',
+    desc: 'Add parents, teachers and learners; review exam papers; track classes; assign teachers on duty.',
+    tabs: [['home', 'home', 'Home'], ['people', 'users', 'People'], ['students', 'graduation', 'Pupils'], ['import', 'upload', 'Import Excel'], ['ldjs', 'trending', 'LDJS Tracker'], ['reports', 'file', 'Reports'], ['papers', 'clipboard', 'Papers'], ['attend', 'checksq', 'Attendance'], ['time', 'calendar', 'Timetable'], ['duty', 'shield', 'Duty Roster'], ['fees', 'money', 'Fees'], ['work', 'book', 'Classwork'], ['videos', 'video', 'Videos'], ['setup', 'settings', 'Setup']]
+  },
+  teacher: {
+    label: 'Teacher Portal — My Classes Only',
+    desc: 'Search your learners, enter marks, see fees balances, upload papers, classwork and videos, view your timetable.',
+    tabs: [['home', 'home', 'My Home'], ['learners', 'search', 'My Learners'], ['papers', 'clipboard', 'My Papers'], ['work', 'book', 'Classwork'], ['videos', 'video', 'Videos'], ['ldjs', 'trending', 'My Class Tracker'], ['attend', 'checksq', 'Attendance'], ['time', 'calendar', 'Timetable'], ['duty', 'shield', 'On Duty'], ['support', 'lifebuoy', 'Support Plan']]
+  },
+  parent: {
+    label: 'Parent Portal — My Children Only',
+    desc: 'Private: your children, results with LDJS bands, fees balance, classwork, lesson videos and timetable.',
+    tabs: [['home', 'home', 'My Children'], ['reports', 'file', 'Report Cards'], ['fees', 'money', 'Fees'], ['work', 'book', 'Classwork'], ['videos', 'video', 'Lesson Videos'], ['time', 'calendar', 'Timetable']]
+  },
+  bursar: {
+    label: 'Bursar Portal — Fees & Payments',
+    desc: 'Fees only: balances instantly, record Mobile Money / Bank / Cash, receipts.',
+    tabs: [['home', 'home', 'Fees Home'], ['fees', 'money', 'Collect Fees'], ['students', 'graduation', 'Pupil Balances'], ['sms', 'message', 'Fee Reminders']]
+  }
+};
+
+function boot() {
+  if (!ME) return;
+  const P = PORTALS[ME.role] || PORTALS.admin;
+  $('loginCard').style.display = 'none';
+  $('regCard').style.display = 'none';
+  $('app').style.display = 'block';
+  document.getElementById('topbar').className = ME.role;
+  const h1 = document.querySelector('#topbar h1');
+  if (h1) h1.textContent = ME.schoolName || 'School Management Platform';
+  $('who').textContent = ME.name;
+  $('roleLine').textContent = P.label + (ME.schoolName ? ' — ' + ME.schoolName : '');
+  const rb = $('roleBadge');
+  rb.className = 'rolebanner ' + ME.role;
+  rb.innerHTML = '<b>' + P.label + '</b><br>' + P.desc;
+  const tabs = $('tabs');
+  tabs.innerHTML = P.tabs.map(([k, i, l], n) => `<button data-t="${k}" class="${n === 0 ? 'on' : ''}" onclick="tab('${k}',this)">${ic(i)} ${l}</button>`).join('');
+  tab(P.tabs[0][0], tabs.querySelector('button'));
+}
+function tab(name, btn) {
+  document.querySelectorAll('#tabs button').forEach((b) => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  const fn = {
+    home: vHome, ldjs: vLDJS, reports: vReports, students: vStudents, import: vImport, fees: vFees,
+    attend: vAttend, time: vTime, sms: vSMS, setup: vSetup, support: vSupport,
+    learners: vLearners, accounts: vAccounts, people: vPeople, papers: vPapers, work: vWork, videos: vVideos, duty: vDuty,
+    schools: vSchools, addschool: vAddSchool
+  }[name];
+  if (fn) fn();
+}
+// ---- Home ----
+async function vHome() {
+  if (ME.role === 'teacher') {
+    const [students, duty, papers] = await Promise.all([api('/api/students'), api('/api/duty'), api('/api/papers')]);
+    const onDuty = (duty.onDuty || []).includes(ME.name);
+    const pending = (papers.papers || []).filter((x) => x.status === 'pending').length;
+    $('content').innerHTML = `<div class="grid">
+      <div class="stat"><b>${students.length}</b><span>My learners</span></div>
+      <div class="stat"><b>${(ME.classes || []).join(', ') || '-'}</b><span>My classes</span></div>
+      <div class="stat ${onDuty ? 'amber' : ''}"><b>${onDuty ? 'Yes' : 'No'}</b><span>On duty this week</span></div>
+      <div class="stat"><b>${pending}</b><span>Papers awaiting review</span></div></div>
+    <div class="card"><h3>${ic('search')} Quick actions</h3>
+    <p><button class="btn" onclick="tab('learners',document.querySelector('[data-t=learners]'))">${ic('search')} Search learners &amp; add marks</button></p>
+    <p><button class="btn green" onclick="tab('videos',document.querySelector('[data-t=videos]'))">${ic('camera')} Record a lesson video</button></p></div>`;
+    return;
+  }
+  if (ME.role === 'parent') {
+    const [students, duty, work, videos] = await Promise.all([api('/api/students'), api('/api/duty'), api('/api/work'), api('/api/videos')]);
+    $('content').innerHTML = `<div class="card"><h3>${ic('home')} My children</h3>
+    ${students.length ? `<table><tr><th>Name</th><th>Class</th><th>Average</th><th>Fees balance</th></tr>
+    ${students.map((s) => `<tr><td>${s.name}</td><td>${s.class}</td><td>${s.average != null ? s.average + '%' : '-'}</td><td>${money(s.balance)}</td></tr>`).join('')}</table>` : '<p class="muted">No children linked to this account yet. Ask the school office.</p>'}</div>
+    <div class="grid"><div class="stat"><b>${work.work.length}</b><span>Classwork items</span></div>
+    <div class="stat"><b>${videos.videos.length}</b><span>Lesson videos</span></div>
+    <div class="stat"><b>${(duty.onDuty || []).join(', ') || '-'}</b><span>On duty this week</span></div></div>`;
+    return;
+  }
+  // admin / headteacher / bursar dashboard
+  const [d, duty] = await Promise.all([api('/api/dashboard'), api('/api/duty')]);
+  $('content').innerHTML = `<div class="grid">
+    <div class="stat"><b>${d.totalStudents}</b><span>Pupils</span></div>
+    <div class="stat"><b>${money(d.feesBalance)}</b><span>Fees balance</span></div>
+    <div class="stat"><b>${d.overallAvg}%</b><span>Overall average</span></div>
+    <div class="stat ${d.overallAvg < 50 ? 'red' : 'green'}"><b>${d.presentToday}</b><span>Present today</span></div></div>
+    <div class="card"><h3>${ic('shield')} On duty this week</h3><p>${(duty.onDuty || []).join(', ') || 'Nobody assigned'}</p></div>
+    <div class="card"><h3>${ic('award')} Top performers</h3>
+    <table><tr><th>Learner</th><th>Class</th><th>Average</th></tr>
+    ${d.top.map((t) => `<tr><td>${t.name || t.id}</td><td>${t.class || '-'}</td><td>${t.avg}%</td></tr>`).join('')}</table></div>
+    <div class="card"><h3>${ic('trending')} Class averages</h3>
+    ${d.classAvgs.map((c) => `<p>${c.class}: <b>${c.avg}%</b> ${flagCls(c.avg >= 60 ? 'On track' : 'Watch')}</p>`).join('') || '<p class="muted">No marks yet</p>'}</div>`;
+}
+// ---- Teacher: My Learners (search + fees balance + add marks) ----
+async function vLearners() {
+  const settings = await api('/api/settings');
+  const secs = settings.sections || {};
+  const subjects = [...new Set([].concat(secs.upper?.subjects || [], secs.lower?.subjects || [], secs.nursery?.subjects || []))];
+  const terms = settings.terms || ['Term 1', 'Term 2', 'Term 3'];
+  const assessments = settings.assessments || ['Beginning of Term', 'Mid-Term', 'End of Term'];
+  $('content').innerHTML = `<div class="card"><h3>${ic('search')} My learners</h3>
+  <p class="muted">You only see learners in your classes: <b>${(ME.classes || []).join(', ') || 'none assigned'}</b></p>
+  <input id="ln_q" placeholder="Search by name, class or phone…" oninput="searchLearners()">
+  <div id="ln_results"></div></div>
+  <div class="card" id="mark_card" style="display:none"><h3>${ic('plus')} Add mark</h3>
+  <input id="mk_student" type="hidden">
+  <p id="mk_who" class="muted"></p>
+  <label>Subject</label><select id="mk_subject">${subjects.map((s) => `<option>${s}</option>`).join('')}</select>
+  <label>Term</label><select id="mk_term">${terms.map((t) => `<option>${t}</option>`).join('')}</select>
+  <label>Assessment</label><select id="mk_assess">${assessments.map((a) => `<option>${a}</option>`).join('')}</select>
+  <label>Score (0-100)</label><input id="mk_score" type="number" min="0" max="100">
+  <button class="btn green" onclick="saveMark()">${ic('check')} Save mark</button></div>`;
+  searchLearners();
+}
+async function searchLearners() {
+  const q = encodeURIComponent(($('ln_q').value || '').trim());
+  const r = await api('/api/students?q=' + q);
+  $('ln_results').innerHTML = r.length ? `<table><tr><th>Name</th><th>Class</th><th>Parent</th><th>Phone</th><th>Average</th><th>Fees balance</th><th></th></tr>
+  ${r.map((s) => `<tr><td>${s.name}</td><td>${s.class}</td><td>${s.parent || '-'}</td><td>${s.parentPhone || '-'}</td>
+  <td>${s.average != null ? s.average + '%' : '-'}</td>
+  <td>${money(s.balance)} ${s.balance > 0 ? '<span class="badge warn">due</span>' : '<span class="badge">clear</span>'}</td>
+  <td><button class="btn" onclick="markFor('${s.id}')">${ic('plus')} Mark</button></td></tr>`).join('')}</table>` : '<p class="muted">No learners found.</p>';
+  window.__lnList = r;
+}
+function markFor(id) {
+  const s = (window.__lnList || []).find((x) => x.id === id);
+  if (!s) return;
+  $('mark_card').style.display = 'block';
+  $('mk_student').value = id;
+  $('mk_who').textContent = 'Adding mark for ' + s.name + ' (' + s.class + ')';
+  $('mark_card').scrollIntoView({ behavior: 'smooth' });
+}
+async function saveMark() {
+  const score = Number($('mk_score').value);
+  if (isNaN(score) || score < 0 || score > 100) return alert('Enter a score between 0 and 100');
+  const r = await api('/api/marks', { method: 'POST', body: JSON.stringify({ studentId: $('mk_student').value, subject: $('mk_subject').value, term: $('mk_term').value, assessment: $('mk_assess').value, score }) });
+  alert(r.ok ? 'Mark saved' : (r.error || 'Failed'));
+  if (r.ok) { $('mk_score').value = ''; searchLearners(); }
+}
+// ---- Admin: Accounts (create any role) ----
+const ROLE_OPTS = [['teacher', 'Teacher'], ['bursar', 'Bursar'], ['parent', 'Parent'], ['headteacher', 'Head Teacher'], ['admin', 'Admin']];
+async function vAccounts() {
+  const [{ users }, students] = await Promise.all([api('/api/users'), api('/api/students')]);
+  window.__students = students;
+  $('content').innerHTML = `<div class="card"><h3>${ic('userplus')} Create account</h3>
+  <label>Role</label><select id="ac_role" onchange="acRoleChanged()">${ROLE_OPTS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select>
+  <div id="ac_extra"></div>
+  <label>Full name</label><input id="ac_name">
+  <label>Email</label><input id="ac_email" type="email">
+  <label>Phone</label><input id="ac_phone">
+  <label>Password</label><input id="ac_password">
+  <button class="btn green" onclick="createAccount()">${ic('plus')} Create account</button></div>
+  <div class="card"><h3>${ic('users')} All accounts (${users.length})</h3>
+  <table><tr><th>Name</th><th>Email</th><th>Role</th><th>Details</th><th></th></tr>
+  ${users.map((u) => `<tr><td>${u.name}</td><td>${u.email}</td><td><span class="badge info">${u.role}</span></td>
+  <td class="muted">${u.role === 'teacher' ? (u.classes || []).join(', ') + ' — ' + (u.subjects || []).join(', ') : u.role === 'parent' ? (u.childrenIds || []).length + ' children' : ''}</td>
+  <td>${u.id !== ME.id ? `<button class="btn ghost" onclick="delAccount('${u.id}')">${ic('trash')} Delete</button>` : ''}</td></tr>`).join('')}</table></div>`;
+  acRoleChanged();
+}
+function acRoleChanged() {
+  const role = $('ac_role').value;
+  let extra = '';
+  if (role === 'teacher') extra = `<label>Classes (comma separated)</label><input id="ac_classes" placeholder="Primary 4, Primary 5"><label>Subjects (comma separated)</label><input id="ac_subjects" placeholder="Mathematics, English">`;
+  if (role === 'parent') extra = `<label>Link children (hold Ctrl/Cmd to select many)</label><select id="ac_children" multiple size="5">${(window.__students || []).map((s) => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('')}</select>`;
+  $('ac_extra').innerHTML = extra;
+}
+async function createAccount() {
+  const body = { role: $('ac_role').value, name: $('ac_name').value, email: $('ac_email').value, phone: $('ac_phone').value, password: $('ac_password').value };
+  if (body.role === 'teacher') { body.classes = $('ac_classes').value.split(',').map((x) => x.trim()).filter(Boolean); body.subjects = $('ac_subjects').value.split(',').map((x) => x.trim()).filter(Boolean); }
+  if (body.role === 'parent') body.childrenIds = [...$('ac_children').selectedOptions].map((o) => o.value);
+  const r = await api('/api/users', { method: 'POST', body: JSON.stringify(body) });
+  alert(r.ok ? 'Account created for ' + r.user.name : (r.error || 'Failed'));
+  if (r.ok) vAccounts();
+}
+async function delAccount(id) {
+  if (!confirm('Delete this account?')) return;
+  const r = await api('/api/users/' + id, { method: 'DELETE' });
+  alert(r.ok ? 'Deleted' : (r.error || 'Failed'));
+  if (r.ok) vAccounts();
+}
+// ---- Head Teacher: People (parents, teachers, learners) ----
+async function vPeople() {
+  const [u, students] = await Promise.all([api('/api/users'), api('/api/students')]);
+  const parents = u.users.filter((x) => x.role === 'parent');
+  const teachers = u.users.filter((x) => x.role === 'teacher');
+  $('content').innerHTML = `
+  <div class="card"><h3>${ic('userplus')} Add teacher</h3>
+  <label>Name</label><input id="pt_name"><label>Email</label><input id="pt_email" type="email">
+  <label>Phone</label><input id="pt_phone"><label>Password</label><input id="pt_password">
+  <label>Classes (comma separated)</label><input id="pt_classes" placeholder="Primary 4, Primary 5">
+  <label>Subjects (comma separated)</label><input id="pt_subjects" placeholder="Mathematics, English">
+  <button class="btn green" onclick="addTeacher()">${ic('plus')} Add teacher</button></div>
+  <div class="card"><h3>${ic('userplus')} Add parent</h3>
+  <label>Name</label><input id="pp_name"><label>Email</label><input id="pp_email" type="email">
+  <label>Phone</label><input id="pp_phone"><label>Password</label><input id="pp_password">
+  <label>Children (hold Ctrl/Cmd to select many)</label><select id="pp_children" multiple size="5">${students.map((s) => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('')}</select>
+  <button class="btn green" onclick="addParent()">${ic('plus')} Add parent</button></div>
+  <div class="card"><h3>${ic('graduation')} Add learner</h3>
+  <label>Name</label><input id="pl_name"><label>Class</label><input id="pl_class" placeholder="Primary 4">
+  <label>Gender (M/F)</label><input id="pl_gender" maxlength="1">
+  <label>Parent name</label><input id="pl_parent"><label>Parent phone</label><input id="pl_phone">
+  <label>Fees billed</label><input id="pl_fees" type="number">
+  <label>Link to parent account (optional)</label><select id="pl_link"><option value="">— none —</option>${parents.map((p) => `<option value="${p.id}">${p.name}</option>`).join('')}</select>
+  <button class="btn green" onclick="addLearner()">${ic('plus')} Add learner</button></div>
+  <div class="card"><h3>${ic('users')} Staff &amp; parents</h3>
+  <h4>Teachers (${teachers.length})</h4>
+  <table><tr><th>Name</th><th>Classes</th><th>Subjects</th><th>Phone</th></tr>
+  ${teachers.map((t) => `<tr><td>${t.name}</td><td>${(t.classes || []).join(', ')}</td><td>${(t.subjects || []).join(', ')}</td><td>${t.phone || '-'}</td></tr>`).join('')}</table>
+  <h4>Parents (${parents.length})</h4>
+  <table><tr><th>Name</th><th>Email</th><th>Children</th></tr>
+  ${parents.map((p) => `<tr><td>${p.name}</td><td>${p.email}</td><td>${(p.childrenIds || []).map((id) => (students.find((s) => s.id === id) || {}).name || id).join(', ')}</td></tr>`).join('')}</table></div>`;
+}
+async function addTeacher() {
+  const r = await api('/api/users', { method: 'POST', body: JSON.stringify({ role: 'teacher', name: $('pt_name').value, email: $('pt_email').value, phone: $('pt_phone').value, password: $('pt_password').value, classes: $('pt_classes').value.split(',').map((x) => x.trim()).filter(Boolean), subjects: $('pt_subjects').value.split(',').map((x) => x.trim()).filter(Boolean) }) });
+  alert(r.ok ? 'Teacher added' : (r.error || 'Failed'));
+  if (r.ok) vPeople();
+}
+async function addParent() {
+  const r = await api('/api/users', { method: 'POST', body: JSON.stringify({ role: 'parent', name: $('pp_name').value, email: $('pp_email').value, phone: $('pp_phone').value, password: $('pp_password').value, childrenIds: [...$('pp_children').selectedOptions].map((o) => o.value) }) });
+  alert(r.ok ? 'Parent added' : (r.error || 'Failed'));
+  if (r.ok) vPeople();
+}
+async function addLearner() {
+  const r = await api('/api/students', { method: 'POST', body: JSON.stringify({ name: $('pl_name').value, class: $('pl_class').value, gender: $('pl_gender').value, parent: $('pl_parent').value, parentPhone: $('pl_phone').value, feesBilled: Number($('pl_fees').value) || 0, parentUserId: $('pl_link').value }) });
+  alert(r.ok ? 'Learner added' : (r.error || 'Failed'));
+  if (r.ok) vPeople();
+}
+// ---- Papers: teachers submit; head teacher reviews ----
+async function vPapers() {
+  const { papers } = await api('/api/papers');
+  const isAdminish = ME.role === 'admin' || ME.role === 'headteacher';
+  const statusBadge = (s) => s === 'approved' ? '<span class="badge">Approved</span>' : s === 'changes' ? '<span class="badge bad">Changes requested</span>' : '<span class="badge warn">Pending review</span>';
+  $('content').innerHTML = `${ME.role === 'teacher' || isAdminish ? `<div class="card"><h3>${ic('upload')} ${isAdminish ? 'Upload a paper (for archive)' : 'Submit exam paper for review'}</h3>
+  <label>Title</label><input id="pa_title" placeholder="P5 Mathematics End of Term">
+  <label>Class</label><input id="pa_class" placeholder="Primary 5">
+  <label>Subject</label><input id="pa_subject" placeholder="Mathematics">
+  <label>Term</label><input id="pa_term" placeholder="Term 1">
+  <label>Paper content (type or paste questions)</label><textarea id="pa_text" rows="5"></textarea>
+  <label>Or attach a file (optional)</label><input id="pa_file" type="file">
+  <button class="btn green" onclick="submitPaper()">${ic('send')} Submit for review</button></div>` : ''}
+  <div class="card"><h3>${ic('clipboard')} ${isAdminish ? 'All papers' : 'My papers'} (${papers.length})</h3>
+  ${papers.map((p) => `<div class="paperbox">
+    <b>${p.title}</b> ${statusBadge(p.status)}<br>
+    <span class="muted">${p.class} — ${p.subject} — ${p.term} — by ${p.teacherName}</span>
+    <pre class="papertext">${p.text || ''}</pre>
+    ${p.fileId ? `<p><a href="/api/files/${p.fileId}?token=${TOKEN}" target="_blank">${ic('download')} ${p.fileName || 'Attachment'}</a></p>` : ''}
+    ${isAdminish && p.status === 'pending' ? `<textarea id="fb_${p.id}" rows="2" placeholder="Feedback (optional)"></textarea>
+    <button class="btn green" onclick="reviewPaper('${p.id}','approved')">${ic('check')} Approve</button>
+    <button class="btn ghost" onclick="reviewPaper('${p.id}','changes')">${ic('x')} Request changes</button>` : ''}
+    ${!isAdminish && p.feedback ? `<p class="muted">${ic('message')} Feedback: ${p.feedback}</p>` : ''}
+  </div>`).join('') || '<p class="muted">No papers yet.</p>'}</div>`;
+}
+async function submitPaper() {
+  const body = { title: $('pa_title').value, class: $('pa_class').value, subject: $('pa_subject').value, term: $('pa_term').value, text: $('pa_text').value };
+  const f = $('pa_file').files[0];
+  if (f) { body.fileName = f.name; body.fileBase64 = await fileB64(f); }
+  const r = await api('/api/papers', { method: 'POST', body: JSON.stringify(body) });
+  alert(r.ok ? 'Paper submitted for review' : (r.error || 'Failed'));
+  if (r.ok) vPapers();
+}
+async function reviewPaper(id, status) {
+  const r = await api('/api/papers/review', { method: 'POST', body: JSON.stringify({ id, status, feedback: ($('fb_' + id) || {}).value || '' }) });
+  alert(r.ok ? 'Review saved' : (r.error || 'Failed'));
+  if (r.ok) vPapers();
+}
+function fileB64(f) {
+  return new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(f); });
+}
+
+// ---- Classwork: teachers upload; parents see their children's classes ----
+async function vWork() {
+  const { work } = await api('/api/work');
+  const canUpload = ME.role === 'teacher' || ME.role === 'admin' || ME.role === 'headteacher';
+  $('content').innerHTML = `${canUpload ? `<div class="card"><h3>${ic('upload')} Upload classwork</h3>
+  <label>Title</label><input id="wk_title" placeholder="Holiday Maths Package">
+  <label>Class</label><input id="wk_class" placeholder="Primary 5" value="${ME.role === 'teacher' ? (ME.classes || [])[0] || '' : ''}">
+  <label>Subject</label><input id="wk_subject">
+  <label>Instructions</label><textarea id="wk_body" rows="4"></textarea>
+  <label>Due date (optional)</label><input id="wk_due" type="date">
+  <label>Attachment (optional)</label><input id="wk_file" type="file">
+  <button class="btn green" onclick="uploadWork()">${ic('upload')} Upload for class</button></div>` : ''}
+  <div class="card"><h3>${ic('book')} Classwork (${work.length})</h3>
+  ${work.map((w) => `<div class="paperbox"><b>${w.title}</b> <span class="badge info">${w.class}</span>
+  <span class="muted">${w.subject || ''} — by ${w.teacherName}${w.dueDate ? ' — due ' + w.dueDate : ''}</span>
+  <p>${w.body || ''}</p>
+  ${w.fileId ? `<p><a href="/api/files/${w.fileId}?token=${TOKEN}" target="_blank">${ic('download')} ${w.fileName || 'Attachment'}</a></p>` : ''}</div>`).join('') || '<p class="muted">No classwork posted yet.</p>'}</div>`;
+}
+async function uploadWork() {
+  const body = { title: $('wk_title').value, class: $('wk_class').value, subject: $('wk_subject').value, body: $('wk_body').value, dueDate: $('wk_due').value };
+  const f = $('wk_file').files[0];
+  if (f) { body.fileName = f.name; body.fileBase64 = await fileB64(f); }
+  const r = await api('/api/work', { method: 'POST', body: JSON.stringify(body) });
+  alert(r.ok ? 'Classwork uploaded' : (r.error || 'Failed'));
+  if (r.ok) vWork();
+}
+// ---- Videos: teachers record/upload; parents stream ----
+let REC = null, RECSTREAM = null, RECCHUNKS = [], RECBLOB = null;
+async function vVideos() {
+  const { videos } = await api('/api/videos?token=' + TOKEN);
+  const canUpload = ME.role === 'teacher' || ME.role === 'admin' || ME.role === 'headteacher';
+  $('content').innerHTML = `${canUpload ? `<div class="card"><h3>${ic('camera')} Record or upload a lesson video</h3>
+  <p class="muted">Record a short explanation of a concept — parents and learners watch it at home.</p>
+  <label>Title</label><input id="vd_title" placeholder="Primary 5 Fractions intro">
+  <label>Class</label><input id="vd_class" value="${ME.role === 'teacher' ? (ME.classes || [])[0] || '' : ''}">
+  <label>Subject</label><input id="vd_subject">
+  <label>Description</label><textarea id="vd_desc" rows="2"></textarea>
+  <p><button class="btn" id="recBtn" onclick="toggleRec()">${ic('camera')} Start recording</button></p>
+  <video id="recPreview" controls style="width:100%;max-height:260px;display:none"></video>
+  <p id="recStatus" class="muted"></p>
+  <label>Or upload a video file (webm/mp4, up to ~250MB)</label><input id="vd_file" type="file" accept="video/*">
+  <button class="btn green" onclick="uploadVideo()">${ic('upload')} Upload video</button></div>` : ''}
+  <div class="card"><h3>${ic('video')} Lesson videos (${videos.length})</h3>
+  ${videos.map((v) => `<div class="paperbox"><b>${v.title}</b> <span class="badge info">${v.class}</span>
+  <span class="muted">${v.subject || ''} — by ${v.teacherName}</span>
+  ${v.description ? `<p>${v.description}</p>` : ''}
+  <video controls preload="metadata" src="${v.url}" style="width:100%;max-height:300px"></video></div>`).join('') || '<p class="muted">No videos yet.</p>'}</div>`;
+}
+async function toggleRec() {
+  if (REC && REC.state === 'recording') {
+    REC.stop();
+    $('recBtn').innerHTML = ic('camera') + ' Start recording';
+    return;
+  }
+  try {
+    RECSTREAM = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    RECCHUNKS = []; RECBLOB = null;
+    REC = new MediaRecorder(RECSTREAM);
+    REC.ondataavailable = (e) => { if (e.data.size) RECCHUNKS.push(e.data); };
+    REC.onstop = () => {
+      RECBLOB = new Blob(RECCHUNKS, { type: 'video/webm' });
+      const pv = $('recPreview');
+      pv.style.display = 'block';
+      pv.src = URL.createObjectURL(RECBLOB);
+      $('recStatus').textContent = 'Recorded ' + Math.round(RECBLOB.size / 1024) + ' KB. Fill the form and press Upload.';
+      RECSTREAM.getTracks().forEach((t) => t.stop());
+    };
+    REC.start();
+    $('recBtn').innerHTML = ic('stop') + ' Stop recording';
+    $('recStatus').textContent = 'Recording… speak clearly, then press Stop.';
+  } catch (e) { alert('Camera/microphone not available: ' + e.message); }
+}
+async function uploadVideo() {
+  const body = { title: $('vd_title').value, class: $('vd_class').value, subject: $('vd_subject').value, description: $('vd_desc').value };
+  const f = $('vd_file').files[0];
+  if (RECBLOB) { body.fileName = 'recording.webm'; body.videoBase64 = await blobB64(RECBLOB); }
+  else if (f) { body.fileName = f.name; body.videoBase64 = await fileB64(f); }
+  else return alert('Record a video or choose a file first');
+  const r = await api('/api/videos', { method: 'POST', body: JSON.stringify(body) });
+  alert(r.ok ? 'Video uploaded' : (r.error || 'Failed'));
+  if (r.ok) { RECBLOB = null; vVideos(); }
+}
+function blobB64(b) {
+  return new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.readAsDataURL(b); });
+}
+
+// ---- Duty roster: everyone views; admin/head teacher assigns per week ----
+async function vDuty() {
+  const d = await api('/api/duty');
+  const isAdminish = ME.role === 'admin' || ME.role === 'headteacher';
+  $('content').innerHTML = `<div class="card"><h3>${ic('shield')} On duty this week (week of ${d.weekStart})</h3>
+  <p><b>${(d.onDuty || []).join(', ') || 'Nobody assigned'}</b></p></div>
+  <div class="card"><h3>${ic('calendar')} Weekly roster</h3>
+  <table><tr><th>Week starting</th><th>Teacher(s) on duty</th></tr>
+  ${(d.roster || []).map((r) => `<tr><td>${r.weekStart}</td><td>${r.teachers.join(', ')}</td></tr>`).join('')}</table></div>
+  ${isAdminish ? `<div class="card"><h3>${ic('edit')} Set teachers on duty</h3>
+  <label>Week starting (Monday)</label><input id="dy_week" type="date" value="${d.weekStart}">
+  <label>Teachers (hold Ctrl/Cmd to select many)</label>
+  <select id="dy_teachers" multiple size="4">${(d.teachers || []).map((t) => `<option value="${t.id}">${t.name}</option>`).join('')}</select>
+  <button class="btn green" onclick="saveDuty()">${ic('check')} Save duty roster</button></div>` : ''}`;
+}
+async function saveDuty() {
+  const r = await api('/api/duty', { method: 'POST', body: JSON.stringify({ weekStart: $('dy_week').value, teacherIds: [...$('dy_teachers').selectedOptions].map((o) => o.value) }) });
+  alert(r.ok ? 'Duty roster saved' : (r.error || 'Failed'));
+  if (r.ok) vDuty();
+}
+// ---- Pupils list ----
+async function vStudents() {
+  const r = await api('/api/students');
+  const canAdd = ['admin', 'headteacher', 'bursar'].includes(ME.role);
+  $('content').innerHTML = `<div class="card"><h3>${ic('graduation')} Pupils (${r.students ? r.students.length : r.length})</h3>
+  <table><tr><th>Name</th><th>Class</th><th>Gender</th><th>Parent</th><th>Phone</th><th>Average</th><th>Fees balance</th></tr>
+  ${(r.students || r).map((s) => `<tr><td>${s.name}</td><td>${s.class}</td><td>${s.gender || '-'}</td><td>${s.parent || '-'}</td><td>${s.parentPhone || '-'}</td><td>${s.average != null ? s.average + '%' : '-'}</td><td>${money(s.balance != null ? s.balance : (s.feesBilled || 0) - (s.paid || 0))}</td></tr>`).join('')}</table></div>`;
+}
+
+// ---- Import ----
+let IMP = null;
+async function vImport() {
+  $('content').innerHTML = `<div class="card"><h3>${ic('upload')} Import Pupils</h3>
+  <p class="muted">Accepts your LDJS tracker results sheets (.xlsx — imports pupils + all scores) or a simple pupil list (.csv) with columns Name | Class | Parent | Phone | Fees | Gender.</p>
+  <p><a href="/api/import-template?token=${TOKEN}" target="_blank">${ic('download')} Download pupil template (CSV)</a></p>
+  <input id="imp_file" type="file" accept=".xlsx,.csv"><button class="btn green" onclick="doPreview()">${ic('eye')} Preview</button><div id="imp_out"></div></div>`;
+}
+async function doPreview() {
+  const f = $('imp_file').files[0]; if (!f) return alert('Choose an .xlsx or .csv file first');
+  $('imp_out').innerHTML = '<p>Reading file…</p>';
+  const b64 = await fileB64(f);
+  const isCsv = /\.csv$/i.test(f.name || '');
+  const r = isCsv
+    ? await api('/api/import-upload', { method: 'POST', body: JSON.stringify({ fileName: f.name, fileBase64: b64 }) })
+    : await api('/api/import-preview', { method: 'POST', body: JSON.stringify({ fileBase64: b64 }) });
+  if (r.error) { $('imp_out').innerHTML = '<p class="err">' + r.error + '</p>'; return; }
+  IMP = r;
+  $('imp_out').innerHTML = `<p><b>${r.totalStudents}</b> pupils, <b>${r.totalMarks}</b> scores found.</p>
+  ${(r.notes || []).map((n) => `<p class="muted">${n}</p>`).join('')}
+  <table><tr><th>Name</th><th>Class</th><th>Parent</th><th>Fees</th></tr>
+  ${r.students.map((s) => `<tr><td>${s.name}</td><td>${s.class}</td><td>${s.parent || ''}</td><td>${s.feesBilled || 0}</td></tr>`).join('')}</table>
+  <button class="btn green" onclick="doConfirm()">${ic('check')} Confirm import ${r.totalStudents} pupils</button>`;
+}
+async function doConfirm() {
+  if (!IMP) return;
+  const payload = IMP.importToken ? { importToken: IMP.importToken } : { students: IMP.students, marks: IMP.marks };
+  const r = await api('/api/import-confirm', { method: 'POST', body: JSON.stringify(payload) });
+  alert(r.ok ? 'Imported: new pupils ' + r.addedStudents + ', scores ' + r.addedMarks : (r.error || 'Failed'));
+  tab('students', document.querySelector('[data-t="students"]'));
+}
+
+// ---- LDJS ----
+async function vLDJS() {
+  const term = encodeURIComponent(vLDJS.term || 'Term 1');
+  const l = await api('/api/ldjs?term=' + term);
+  vLDJS.term = decodeURIComponent(term);
+  const terms = (l.settings && l.settings.terms) || ['Term 1', 'Term 2', 'Term 3'];
+  $('content').innerHTML = `<div class="card"><h3>${ic('trending')} LDJS Tracker</h3>
+  <label>Term</label><select onchange="vLDJS.term=this.value;vLDJS()">${terms.map((t) => `<option ${t === vLDJS.term ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+  <div class="card"><h3>${ic('alert')} Flagged classes</h3>
+  ${l.flaggedClasses.length ? l.flaggedClasses.map((c) => `<p>${c.class}: avg ${c.average}% — ${flagCls(c.flag)} (weakest: ${c.weakestSubject})</p>`).join('') : '<p class="muted">None</p>'}</div>
+  <div class="card"><h3>${ic('alert')} Flagged learners</h3>
+  ${l.flaggedLearners.length ? l.flaggedLearners.map((f) => `<p>${f.name} (${f.class}) — ${f.average}% — ${flagCls(f.flag)}</p>`).join('') : '<p class="muted">None</p>'}</div>
+  <div class="card"><h3>${ic('trending')} Class summary</h3>
+  <table><tr><th>Class</th><th>Learners</th><th>Avg</th><th>Below pass</th><th>Flag</th><th>Weakest</th></tr>
+  ${l.classes.map((c) => `<tr><td>${c.class}</td><td>${c.withScores}/${c.count}</td><td>${c.average != null ? c.average + '%' : '-'}</td><td>${c.shareBelow != null ? c.shareBelow + '%' : '-'}</td><td>${flagCls(c.flag)}</td><td>${c.weakestSubject}</td></tr>`).join('')}</table></div>`;
+}
+
+// ---- Reports ----
+async function vReports() {
+  const r = await api('/api/students');
+  const list = r.students || r;
+  $('content').innerHTML = `<div class="card"><h3>${ic('file')} Report cards</h3>
+  <label>Learner</label><select id="rp_st">${list.map((s) => `<option value="${s.id}">${s.name} (${s.class})</option>`).join('')}</select>
+  <button class="btn" onclick="showReport()">${ic('eye')} Show report</button>
+  <div id="rp_out"></div></div>`;
+}
+async function showReport() {
+  const r = await api('/api/report?studentId=' + $('rp_st').value + '&term=' + encodeURIComponent('Term 1'));
+  if (r.error) return alert(r.error);
+  $('rp_out').innerHTML = `<div class="report"><h3>${r.student.name} — ${r.term}</h3>
+  <table><tr><th>Subject</th><th>Score</th><th>Grade</th></tr>
+  ${r.marks.map((m) => `<tr><td>${m.subject}</td><td>${m.score}</td><td>${m.grade}</td></tr>`).join('')}</table>
+  <p><b>Average: ${r.average}% (${r.overallGrade})</b></p>
+  <button class="btn ghost noprint" onclick="window.print()">${ic('file')} Print</button></div>`;
+}
+// ---- Fees ----
+async function vFees() {
+  const [students, fees] = await Promise.all([api('/api/students'), api('/api/fees')]);
+  const list = students.students || students;
+  const canRecord = ['admin', 'bursar'].includes(ME.role);
+  $('content').innerHTML = `${canRecord ? `<div class="card"><h3>${ic('money')} Record payment</h3>
+  <label>Learner</label><select id="fe_st">${list.map((s) => `<option value="${s.id}">${s.name} (${s.class}) — balance ${money(s.balance != null ? s.balance : 0)}</option>`).join('')}</select>
+  <label>Amount</label><input id="fe_amt" type="number">
+  <label>Method</label><select id="fe_method"><option>Mobile Money</option><option>Bank</option><option>Cash</option></select>
+  <button class="btn green" onclick="payFees()">${ic('check')} Record payment</button></div>` : ''}
+  <div class="card"><h3>${ic('money')} Balances</h3>
+  <table><tr><th>Learner</th><th>Class</th><th>Billed</th><th>Paid</th><th>Balance</th></tr>
+  ${list.map((s) => `<tr><td>${s.name}</td><td>${s.class}</td><td>${money(s.feesBilled)}</td><td>${money(s.paid)}</td><td>${money(s.balance)}</td></tr>`).join('')}</table>
+  <h4>Recent payments</h4>
+  <table><tr><th>Date</th><th>Learner</th><th>Amount</th><th>Method</th></tr>
+  ${fees.slice(-10).reverse().map((f) => { const s = list.find((x) => x.id === f.studentId) || {}; return `<tr><td>${f.date}</td><td>${s.name || f.studentId}</td><td>${money(f.amount)}</td><td>${f.method}</td></tr>`; }).join('')}</table></div>`;
+}
+async function payFees() {
+  const r = await api('/api/fees', { method: 'POST', body: JSON.stringify({ studentId: $('fe_st').value, amount: Number($('fe_amt').value), method: $('fe_method').value }) });
+  alert(r.ok ? 'Payment recorded' : (r.error || 'Failed'));
+  if (!r.error) vFees();
+}
+
+// ---- Attendance ----
+async function vAttend() {
+  const students = await api('/api/students');
+  const list = students.students || students;
+  $('content').innerHTML = `<div class="card"><h3>${ic('checksq')} Attendance</h3>
+  <label>Date</label><input id="at_date" type="date" value="${new Date().toISOString().slice(0, 10)}">
+  <table><tr><th>Learner</th><th>Status</th></tr>
+  ${list.map((s) => `<tr><td>${s.name} (${s.class})</td><td><select id="at_${s.id}"><option value="present">Present</option><option value="absent">Absent</option><option value="late">Late</option></select></td></tr>`).join('')}</table>
+  <button class="btn green" onclick="saveAttend()">${ic('check')} Save attendance</button></div>`;
+  window.__attIds = list.map((s) => s.id);
+}
+async function saveAttend() {
+  const records = (window.__attIds || []).map((id) => ({ personId: id, status: $('at_' + id).value }));
+  const r = await api('/api/attendance', { method: 'POST', body: JSON.stringify({ date: $('at_date').value, type: 'student', records }) });
+  alert(r.ok ? 'Attendance saved' : (r.error || 'Failed'));
+}
+// ---- Timetable ----
+async function vTime() {
+  const rows = await api('/api/timetable');
+  $('content').innerHTML = `<div class="card"><h3>${ic('calendar')} Timetable</h3>
+  <table><tr><th>Class</th><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th></tr>
+  ${rows.map((r) => `<tr><td>${r.class}</td><td>${r.day}</td><td>${r.period}</td><td>${r.subject}</td><td>${r.teacher}</td></tr>`).join('')}</table></div>`;
+}
+
+// ---- SMS ----
+async function vSMS() {
+  const log = await api('/api/sms');
+  $('content').innerHTML = `<div class="card"><h3>${ic('message')} Send SMS</h3>
+  <label>To (phone or group)</label><input id="s_to" placeholder="+2567...">
+  <select id="s_grp"><option value="">individual</option><option value="all-parents">All parents</option><option value="all-teachers">All teachers</option></select>
+  <label>Message</label><textarea id="s_msg" rows="3"></textarea>
+  <button class="btn green" onclick="sendMsg()">${ic('send')} Send</button></div>
+  <div class="card"><h3>${ic('clock')} Log</h3>
+  <table><tr><th>To</th><th>Message</th><th>Status</th><th>At</th></tr>
+  ${log.slice(-10).reverse().map((e) => `<tr><td>${e.to}</td><td>${(e.message || '').slice(0, 40)}</td><td>${e.status}</td><td>${(e.at || '').slice(0, 16)}</td></tr>`).join('')}</table></div>`;
+}
+async function sendMsg() {
+  const r = await api('/api/sms', { method: 'POST', body: JSON.stringify({ to: $('s_to').value, message: $('s_msg').value, group: $('s_grp').value }) });
+  alert(r.ok ? 'Sent to ' + r.sent.length : (r.error || 'Failed'));
+  vSMS();
+}
+
+// ---- Setup ----
+async function vSetup() {
+  const s = await api('/api/settings');
+  $('content').innerHTML = `<div class="card"><h3>${ic('settings')} LDJS Settings</h3>
+  <label>Pass mark %</label><input id="st_pass" type="number" value="${s.passMark}">
+  <label>Class target avg %</label><input id="st_tgt" type="number" value="${s.classTarget}">
+  <label>Flag trigger (0.3 = 30%)</label><input id="st_trg" type="number" step="0.05" value="${s.flagTrigger}">
+  <label>Excellent from %</label><input id="st_exc" type="number" value="${s.bandExcellent}">
+  <label>Good from %</label><input id="st_good" type="number" value="${s.bandGood}">
+  <label>Weak from %</label><input id="st_weak" type="number" value="${s.bandWeak}">
+  <button class="btn green" onclick="saveSetup()">${ic('check')} Save settings</button></div>`;
+}
+async function saveSetup() {
+  await api('/api/settings', { method: 'POST', body: JSON.stringify({ passMark: Number($('st_pass').value), classTarget: Number($('st_tgt').value), flagTrigger: Number($('st_trg').value), bandExcellent: Number($('st_exc').value), bandGood: Number($('st_good').value), bandWeak: Number($('st_weak').value) }) });
+  alert('Saved');
+}
+
+// ---- Support plan ----
+async function vSupport() {
+  const plans = await api('/api/support');
+  const l = await api('/api/ldjs?term=Term%201');
+  $('content').innerHTML = `<div class="card"><h3>${ic('lifebuoy')} Support Plan — act on LDJS flags</h3>
+  <p class="muted">Every flagged learner/class gets: action + teacher responsible + date.</p>
+  <input id="sp_who" placeholder="Learner or class e.g. John Kato / Primary 6">
+  <input id="sp_act" placeholder="Action e.g. Extra Maths 3x/week">
+  <input id="sp_t" placeholder="Teacher responsible"><input id="sp_d" type="date">
+  <button class="btn green" onclick="addPlan()">${ic('plus')} Add to plan</button>
+  <h4>Open plans (${plans.length})</h4>
+  <table><tr><th>Who</th><th>Action</th><th>Teacher</th><th>Date</th><th>Status</th></tr>
+  ${plans.map((p) => `<tr><td>${p.who || ''}</td><td>${p.action || ''}</td><td>${p.teacher || ''}</td><td>${p.date || ''}</td><td>${p.status}</td></tr>`).join('')}</table>
+  <h4>Auto-flagged now</h4>${l.flaggedLearners.map((f) => `<p>${f.name} (${f.class}) — ${f.average}% ${f.flag}</p>`).join('')}</div>`;
+}
+async function addPlan() {
+  await api('/api/support', { method: 'POST', body: JSON.stringify({ who: $('sp_who').value, action: $('sp_act').value, teacher: $('sp_t').value, date: $('sp_d').value }) });
+  vSupport();
+}
+
+boot();

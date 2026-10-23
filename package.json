@@ -1,0 +1,13 @@
+{
+  "name": "school-management-system",
+  "version": "1.0.0",
+  "description": "Cloud School Management System - mobile & desktop ready, all 10 features",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "backup": "node backup.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

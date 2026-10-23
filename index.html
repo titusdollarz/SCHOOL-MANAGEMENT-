@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lunavex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header id="topbar" class="topbar-guest">
+  <div class="brand">
+    <div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg></div>
+    <div><h1>Lunavex</h1><p>Built by Lunavex Technologies — One platform. Every school. Complete control.</p></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ============ LOGIN (split-screen) ============ -->
+  <div class="authsplit" id="loginCard">
+    <div class="authleft">
+      <div class="logo"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg></div>
+      <h2>Lunavex<br><em>by Lunavex Technologies.</em></h2>
+      <p class="lede">The modern, intelligent management platform built for every school. Built by Lunavex Technologies.</p>
+      <ul class="featurelist">
+        <li><span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><div><b>Multi-school platform</b><span>One system, many fully-isolated schools.</span></div></li>
+        <li><span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><div><b>Role-based portals</b><span>Admins, teachers, parents &amp; bursars.</span></div></li>
+        <li><span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><div><b>Reports, fees &amp; attendance</b><span>Everything in one secure place.</span></div></li>
+      </ul>
+    </div>
+    <div class="authright">
+      <div class="eyebrow">Secure sign in</div>
+      <h1>Welcome Back</h1>
+      <p class="muted">Sign in to your dashboard to continue</p>
+      <div class="rolepick">
+        <button class="role superadmin" onclick="pick('system@school.com','system123')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><b>Super Admin</b></button>
+        <button class="role admin on" onclick="pick('admin@school.com','admin123')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg><b>School Admin</b></button>
+        <button class="role headteacher" onclick="pick('ht@school.com','head123')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg><b>Head</b></button>
+        <button class="role teacher" onclick="pick('teacher@school.com','teach123')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><b>Teacher</b></button>
+        <button class="role parent" onclick="pick('parent@school.com','parent123')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><b>Parent</b></button>
+        <button class="role bursar" onclick="pick('bursar@school.com','bursar123')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><b>Bursar</b></button>
+      </div>
+      <label>Email</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><input id="email" placeholder="you@school.com" autocomplete="username"></div>
+      <label>Password</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="password" type="password" placeholder="Enter your password" autocomplete="current-password"><button class="eye" onclick="togglePw()" aria-label="Show password"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <button class="btn gold block" onclick="login()">Sign In <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      <p id="loginMsg" class="err"></p>
+      <div class="authfoot">
+        <a onclick="showRegister()">Register your school &rarr;</a>
+        <a href="#" onclick="return false" style="color:var(--muted);font-weight:600">Forgot password?</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ REGISTER A SCHOOL ============ -->
+  <div class="authsplit" id="regCard" style="display:none">
+    <div class="authleft">
+      <div class="logo"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <h2>Join the <em>platform.</em></h2>
+      <p class="lede">Create a school account using your email. You become the Head Teacher and can then add teachers, bursars, parents and learners for your school only.</p>
+      <ul class="featurelist">
+        <li><span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span><div><b>Instant provisioning</b><span>Your isolated school database, ready in seconds.</span></div></li>
+        <li><span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><div><b>Private by default</b><span>No other school can see your data.</span></div></li>
+      </ul>
+    </div>
+    <div class="authright">
+      <div class="eyebrow">New school</div>
+      <h1>Register your school</h1>
+      <p class="muted">All fields except phone are required.</p>
+      <label>School name</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg></span><input id="r_schoolName" placeholder="Sunshine Primary"></div>
+      <label>School email (used to login)</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><input id="r_email" type="email" placeholder="you@school.com"></div>
+      <label>School password</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="r_password" type="password" placeholder="Choose a password"></div>
+      <label>Head teacher name</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><input id="r_headName" placeholder="Full name"></div>
+      <label>Head teacher password</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input id="r_headPassword" type="password" placeholder="Head teacher password"></div>
+      <label>School phone (optional)</label>
+      <div class="iwrap"><span class="lead"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><input id="r_phone" placeholder="+256 700 000 000"></div>
+      <button class="btn gold block" onclick="registerSchool()">Create school <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      <p id="regMsg" class="err"></p>
+      <div class="authfoot"><a onclick="hideRegister()">&larr; Back to login</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP (sidebar + main shell) ============ -->
+<div class="shell" id="app" style="display:none">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/></svg></div>
+      <div><b>Lunavex</b><small>School Platform</small></div>
+    </div>
+    <nav class="sidenav" id="tabs"></nav>
+    <div class="sidefoot">
+      <div class="me"><b id="who"></b><div class="muted" id="roleLine"></div></div>
+      <button class="btn ghost" onclick="logout()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout</button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="mainhead">
+      <div class="schoolpill"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg><span id="schoolName">—</span></div>
+      <div class="searchbox"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search anything…" aria-label="Search"></div>
+      <div class="spacer"></div>
+      <div class="avatar" id="avatar">U</div>
+    </div>
+    <div class="mainbody">
+      <div id="roleBadge" class="rolebanner"></div>
+      <div id="content"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
